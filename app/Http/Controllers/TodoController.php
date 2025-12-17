@@ -33,6 +33,28 @@ class TodoController extends Controller
         return response()->json($todo);
     }
 
+    public function update(Request $request, Todo $todo)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'description' => 'nullable|string',
+            'priority' => 'integer',
+            'completed' => 'required|boolean',
+            'completion_date' => 'nullable|date'
+        ]);
+
+        if ($validated['completed'] && !$todo->completed) {
+            $validated['completed_date'] = now();
+        }
+
+        if (!$validated['completed']) {
+            $validated['completed_date'] = null;
+        }
+        $todo->update($validated, );
+
+        return response()->json($todo);
+    }
+
     public function toggle(Todo $todo)
     {
         $todo->update([
@@ -40,5 +62,10 @@ class TodoController extends Controller
         ]);
 
         return response()->json($todo);
+    }
+
+    public function test()
+    {
+        return view('todos.test');
     }
 }

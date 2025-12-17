@@ -1,8 +1,7 @@
 <script setup>
-import TodoList from './components/TodoList.vue';
-
+import TodoBoard from './components/TodoBoard.vue';
 </script>
 
 <template>
-<todo-list/>
+    <todo-board />
 </template>

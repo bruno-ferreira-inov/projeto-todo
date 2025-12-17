@@ -8,7 +8,9 @@ Route::get('/', function () {
     return view('todos.index');
 });
 
-Route::get('/todos',  [TodoController::class, 'index']);
-Route::get ('/todos/list', [TodoController::class, 'list']);
+Route::get('/todos', [TodoController::class, 'index']);
+Route::get('/todos/list', [TodoController::class, 'list']);
 Route::post('/todos', [TodoController::class, 'store']);
 Route::patch('/todos/{todo}/toggle', [TodoController::class, 'toggle']);
+Route::patch('todos/{todo}/update', [TodoController::class, 'update']);
+Route::get('/test', [TodoController::class, 'test']);
