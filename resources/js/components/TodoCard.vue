@@ -22,8 +22,8 @@ const handleClick = () => {
             <div class="text-sm font-semibold text-gray-900">
                 {{ todo.title }}
             </div>
-            <div class="flex justify-end text-xs text-gray-500 mt-2" v-if="todo.completion_date">
-                {{ todo.completion_date }}
+            <div class="flex justify-end text-xs text-gray-500 mt-2">
+                {{ todo.completion_date ?? 'No deadline' }}
             </div>
         </div>
     </button>

@@ -7,7 +7,7 @@ const props = defineProps({
     todos: Array,
 })
 
-const emit = defineEmits(['select'])
+const emit = defineEmits(['edit'])
 </script>
 
 <template>
@@ -15,8 +15,8 @@ const emit = defineEmits(['select'])
         <h2 class="font-semibold text-gray-700 mb-3 text-center">{{ title }}</h2>
 
         <div class="space-y-3">
-            <div v-for="todo in todos" :key="todo.id" class="bg-white rounded-lg">
-                <TodoCard :todo="todo" @select="emit('select', $event)"></TodoCard>
+            <div class="bg-white rounded-lg">
+                <TodoCard v-for="todo in todos" :key=todo.id :todo="todo" @click="$emit('edit', todo)" />
             </div>
         </div>
     </div>

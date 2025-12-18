@@ -1,85 +1,162 @@
 <script setup>
-import { defineProps, defineEmits, watch, ref } from 'vue';
+import { defineProps, defineEmits, watch, ref, onMounted, onBeforeUnmount, computed } from 'vue';
 
 const props = defineProps({
     todo: {
         type: Object,
-        required: true
+        default: null,
     }
 })
 
-const emit = defineEmits(['close', 'updated'])
+const emit = defineEmits(['close', 'save', 'updated'])
 
-const title = ref(props.todo.title)
-const description = ref(props.todo.description)
-const priority = ref(props.todo.priority)
-const completed = ref(props.todo.completed)
-const completionDate = ref(props.todo.completion_date)
+const form = ref({
+    title: '',
+    description: '',
+    priority: 5,
+    completed: false,
+    completion_date: null,
+})
+
+const original = ref(null)
+
+const isEdit = computed(() => !!props.todo)
+
+const hasChanges = computed(() =>
+    JSON.stringify(form.value) !== original.value
+)
 
 watch(
     () => props.todo,
-    (newTodo) => {
-        title.value = newTodo.title;
-        description.value = newTodo.description;
-        priority.value = newTodo.priority;
-        completed.value = newTodo.completed;
-        completionDate.value = newTodo.completion_date
+    (todo) => {
+        if (todo) {
+            form.value = { ...todo }
+            original.value = JSON.stringify(form.value)
+        } else {
+            form.value = {
+                title: '',
+                description: '',
+                priority: 5,
+                completed: false,
+                completion_date: null,
+            }
+            original.value = JSON.stringify(form.value)
+        }
     },
     { immediate: true }
 )
 
-const save = async () => {
-    const result = await fetch(`/todos/${props.todo.id}/update`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document
-                .querySelector('meta[name=csrf-token]')
-                .content,
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-            title: title.value,
-            priority: priority.value,
-            description: description.value,
-            completed: completed.value,
-            completion_date: completionDate.value,
-        })
-    })
+const handleKeydown = (e) => {
+    if (e.key === 'Escape') {
+        emit('close')
+    }
 
-    const updatedTodo = await result.json()
-    emit('updated', updatedTodo)
-    emit('close')
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        save()
+    }
 }
+
+onMounted(() => {
+    window.addEventListener('keydown', handleKeydown)
+})
+
+onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleKeydown)
+})
 
 </script>
 
 <template>
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-        <div class="w-full max-w-md rounded-xl bg-white p-6">
-            <label class="block text-sm font-semibold mb-1">Title</label>
-            <input type="text" class="text-lg font-bold mb-2 border " v-model="title" />
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+        <div class="w-full max-w-lg rounded-2xl bg-white shadow-xl">
 
-            <label class="block font-semibold mt-4">Description</label>
-            <input type="text" class="text-lg mb-2 border" v-model="description" />
+            <!-- Header -->
+            <div class="border-b px-6 py-4">
+                <h2 class="text-lg font-semibold">
+                    {{ isEdit ? 'Edit Todo' : 'Create Todo' }}
+                </h2>
+            </div>
 
-            <label class="block text-sm font-semibold mb-1">Priority</label>
-            <input type="number" v-model.number="priority" min="1" max="5" class="w-24 border mb-2" />
+            <!-- Body -->
+            <div class="px-6 py-4 space-y-4">
 
-            <label class="flex items-center gap-2 mb-4 w-36 border">
-                <input type="checkbox" v-model="completed" />
-                Completed
-            </label>
+                <!-- Title -->
+                <div>
+                    <label class="block text-xs font-medium mb-1">
+                        Title
+                    </label>
+                    <input type="text" v-model="form.title"
+                        class="w-full rounded-lg border px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2" />
+                </div>
 
-            <label class="flex items-center gap-2 mb-4 border">
-                <input type="date" v-model="completionDate" />
-            </label>
+                <!-- Description -->
+                <div>
+                    <label class="block text-xs font-medium mb-1">
+                        Description
+                    </label>
+                    <textarea v-model="form.description" rows="3"
+                        class="w-full rounded-lg border px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2" />
+                </div>
 
-            <div class="flex justify-end gap-2">
-                <button @click="emit('close')">Cancel</button>
-                <button @click="save" class="bg-indigo-600 text-white px-4 py-2 rounded">
-                    Save
+                <!-- Priority + Completion -->
+                <div class="flex items-center justify-between gap-4">
+
+                    <!-- Priority -->
+                    <div>
+                        <label class="flex items-center gap-1 text-xs font-medium mb-1 group">
+                            Priority
+
+                            <!-- Info icon -->
+                            <span class="relative inline-flex items-center justify-center w-4 h-4 rounded-full
+                   text-gray-500 hover:text-gray-700 cursor-pointer">
+                                ℹ
+
+                                <!-- Tooltip -->
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2
+                       hidden group-hover:block
+                       whitespace-nowrap rounded-md bg-gray-800 px-2 py-1
+                       text-[10px] text-white shadow-lg">
+                                    Priority goes from 1 (highest) → 5 (lowest)
+                                </span>
+                            </span>
+                        </label>
+                        <input type="number" v-model.number="form.priority" min="1" max="5"
+                            class="w-24 rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2" />
+                    </div>
+
+                    <!-- Completed -->
+                    <label class="flex items-center gap-2 text-sm font-medium cursor-pointer">
+                        <input type="checkbox" v-model="form.completed" class="h-4 w-4 rounded border" />
+                        Completed
+                    </label>
+                </div>
+
+                <!-- Completion Date -->
+                <div>
+                    <label class="block text-xs font-medium mb-1">
+                        Deadline
+                    </label>
+                    <input type="date" v-model="form.completion_date"
+                        class="rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2" />
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="flex justify-end gap-2 border-t px-6 py-4">
+                <button v-if="isEdit" @click="emit('delete', form)" class="text-sm text-red-600">
+                    Delete
                 </button>
+
+                <div class="flex gap-2 ml-auto">
+                    <button @click="emit('close')" class="rounded-lg px-4 py-2 text-sm font-medium">
+                        Cancel
+                    </button>
+                    <button :disabled="!hasChanges" @click="emit('save', form)"
+                        class="bg-indigo-600 text-white px-4 py-2 rounded disabled:opacity-40">
+                        Save
+                    </button>
+                </div>
             </div>
         </div>
     </div>

@@ -27,6 +27,10 @@ class TodoController extends Controller
 
         $validated = $request->validate([
             'title' => 'required|string',
+            'description' => 'nullable|string',
+            'priority' => 'integer',
+            'completed' => 'required|boolean',
+            'completion_date' => 'nullable|date'
         ]);
         $todo = Todo::create($validated);
 

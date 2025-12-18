@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->datetime('completion_date')->nullable();
             $table->boolean('completed')->default(false);
             $table->dateTime('completed_date')->nullable();
-            $table->integer('priority')->nullable();
+            $table->integer('priority')->nullable()->default(5);
             $table->timestamps();
         });
     }
