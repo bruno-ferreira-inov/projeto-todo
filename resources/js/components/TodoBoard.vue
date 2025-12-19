@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 const todos = ref([])
 const selectedTodo = ref(null)
 const showModal = ref(false)
+const validationErrors = ref({})
 
 const openCreate = () => {
     selectedTodo.value = null
@@ -38,7 +39,13 @@ const saveTodo = async (todo) => {
         body: JSON.stringify(todo),
     })
 
+    if (!result.ok) {
+        const errorData = await result.json()
+        validationErrors.value = errorData.errors || {}
+        return
+    }
     const saved = await result.json()
+    validationErrors.value = {}
 
     if (isEdit) {
         const i = todos.value.findIndex(t => t.id === saved.id)
@@ -88,7 +95,7 @@ const filteredTodos = computed(() => {
     })
 })
 
-const prioritySort = ref('No Priority')
+const prioritySort = ref('Priority ↓')
 const sortedTodos = computed(() => {
     const list = [...filteredTodos.value]
 
@@ -112,9 +119,6 @@ const groupedTodos = computed(() => {
                 // incomplete first
                 if (a.completed && !b.completed) return 1
                 if (!a.completed && b.completed) return -1
-
-                // if both same completion state, sort by priority (ascending)
-                return a.priority - b.priority
             })
     }
 
@@ -148,8 +152,7 @@ onMounted(fetchTodos)
             </button>
             <!-- Status filter -->
             <div class="justify-end px-8">
-                <PillDropdown v-model="prioritySort" :options="['No Priority', 'Priority ↑', 'Priority ↓']"
-                    class="mr-2" />
+                <PillDropdown v-model="prioritySort" :options="['Priority ↑', 'Priority ↓']" class="mr-2" />
                 <PillDropdown v-model="statusFilter" :options="['All', 'Pending', 'Completed']" />
             </div>
         </div>
@@ -174,5 +177,6 @@ onMounted(fetchTodos)
         </div>
     </div>
 
-    <TodoModal v-if="showModal" :todo="selectedTodo" @save="saveTodo" @close="showModal = false" @delete="deleteTodo" />
+    <TodoModal v-if="showModal" :todo="selectedTodo" :validation-errors="validationErrors" @save="saveTodo"
+        @close="showModal = false" @delete="deleteTodo" />
 </template>

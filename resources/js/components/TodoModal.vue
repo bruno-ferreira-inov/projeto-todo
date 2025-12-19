@@ -5,7 +5,11 @@ const props = defineProps({
     todo: {
         type: Object,
         default: null,
-    }
+    },
+    validationErrors: {
+        type: Object,
+        default: () => ({}),
+    },
 })
 
 const emit = defineEmits(['close', 'save', 'delete', 'updated'])
@@ -95,8 +99,11 @@ onBeforeUnmount(() => {
                     <label class="block text-sm font-medium mb-1">
                         Title
                     </label>
-                    <input type="text" v-model="form.title"
+                    <input type="text" v-model="form.title" required
                         class="w-full rounded-lg border border-gray-400 px-3 py-2 text-base font-medium focus:outline-none focus:ring-1" />
+                    <p v-if="validationErrors.title" class="text-red-500 text-sm">
+                        {{ validationErrors.title[0] }}
+                    </p>
                 </div>
 
                 <!-- Description -->
