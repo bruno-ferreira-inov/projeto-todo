@@ -104,14 +104,29 @@ const sortedTodos = computed(() => {
 })
 
 const today = dayjs().startOf('day')
-const groupedTodos = computed(() => ({
-    overdue: sortedTodos.value.filter(t => dayjs(t.completion_date).startOf('day').isBefore(today, 'day')),
-    today: sortedTodos.value.filter(t => dayjs(t.completion_date).startOf('day').isSame(today, 'day')),
-    next3: sortedTodos.value.filter(t => dayjs(t.completion_date).startOf('day').isAfter(today) && dayjs(t.completion_date).diff(today, 'day') <= 3),
-    next7: sortedTodos.value.filter(t => dayjs(t.completion_date).startOf('day').isAfter(today) && dayjs(t.completion_date).diff(today, 'day') >= 4 && dayjs(t.completion_date).diff(today, 'day') <= 7),
-    later: sortedTodos.value.filter(t => dayjs(t.completion_date).startOf('day').diff(today, 'day') > 7),
-    noDeadline: sortedTodos.value.filter(t => !t.completion_date),
-}))
+const groupedTodos = computed(() => {
+    const sortColumn = (todos) => {
+        return todos
+            .slice() // clone so we don’t mutate original
+            .sort((a, b) => {
+                // incomplete first
+                if (a.completed && !b.completed) return 1
+                if (!a.completed && b.completed) return -1
+
+                // if both same completion state, sort by priority (ascending)
+                return a.priority - b.priority
+            })
+    }
+
+    return {
+        overdue: sortColumn(sortedTodos.value.filter(t => dayjs(t.completion_date).startOf('day').isBefore(today, 'day'))),
+        today: sortColumn(sortedTodos.value.filter(t => dayjs(t.completion_date).startOf('day').isSame(today, 'day'))),
+        next3: sortColumn(sortedTodos.value.filter(t => dayjs(t.completion_date).startOf('day').isAfter(today) && dayjs(t.completion_date).diff(today, 'day') <= 3)),
+        next7: sortColumn(sortedTodos.value.filter(t => dayjs(t.completion_date).startOf('day').isAfter(today) && dayjs(t.completion_date).diff(today, 'day') >= 4 && dayjs(t.completion_date).diff(today, 'day') <= 7)),
+        later: sortColumn(sortedTodos.value.filter(t => dayjs(t.completion_date).startOf('day').diff(today, 'day') > 7)),
+        noDeadline: sortColumn(sortedTodos.value.filter(t => !t.completion_date)),
+    }
+})
 
 onMounted(fetchTodos)
 </script>

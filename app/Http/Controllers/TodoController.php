@@ -15,7 +15,7 @@ class TodoController extends Controller
     public function list()
     {
         return response()->json(
-            Todo::latest()->get()
+            Todo::orderBy('priority', 'asc')->get()
         );
     }
 
