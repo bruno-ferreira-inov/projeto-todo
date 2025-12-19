@@ -16,13 +16,14 @@ const handleClick = () => {
 </script>
 
 <template>
-    <button @click="handleClick" class="block w-full rounded-xl border p-3 shadow-sm bg-white
-    hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-3">
-        <div class="flex flex-col justify between h-full min-h-[24px]">
-            <div class="text-sm font-semibold text-gray-900">
+    <button @click="handleClick" class="block w-full rounded-xl border-t border-gray-300 p-3
+    hover:bg-gray-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+
+        <div class="flex flex-col h-full min-h-[24px]">
+            <div class="text-base font-medium text-gray-900">
                 {{ todo.title }}
             </div>
-            <div class="flex justify-end text-xs text-gray-500 mt-2">
+            <div class="flex justify-center text-sm text-gray-500">
                 {{ todo.completion_date ?? 'No deadline' }}
             </div>
         </div>

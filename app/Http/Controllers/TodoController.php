@@ -59,6 +59,10 @@ class TodoController extends Controller
         return response()->json($todo);
     }
 
+    public function delete(Todo $todo)
+    {
+        $todo->delete();
+    }
     public function toggle(Todo $todo)
     {
         $todo->update([

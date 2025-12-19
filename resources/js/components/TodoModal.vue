@@ -8,7 +8,7 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['close', 'save', 'updated'])
+const emit = defineEmits(['close', 'save', 'delete', 'updated'])
 
 const form = ref({
     title: '',
@@ -71,10 +71,19 @@ onBeforeUnmount(() => {
         <div class="w-full max-w-lg rounded-2xl bg-white shadow-xl">
 
             <!-- Header -->
-            <div class="border-b px-6 py-4">
-                <h2 class="text-lg font-semibold">
-                    {{ isEdit ? 'Edit Todo' : 'Create Todo' }}
-                </h2>
+            <div class="border-b w-124 justify-center px-6 py-4">
+                <div class="flex justify-between">
+
+                    <h2 class="text-2xl font-semibold">
+                        {{ isEdit ? 'Edit Todo' : 'Create Todo' }}
+                    </h2>
+
+                    <!-- Completed -->
+                    <label class="flex justify-end items-center gap-2 text-base font-medium cursor-pointer">
+                        <input type="checkbox" v-model="form.completed" class="h-4 w-4 rounded border" />
+                        Completed
+                    </label>
+                </div>
             </div>
 
             <!-- Body -->
@@ -82,20 +91,20 @@ onBeforeUnmount(() => {
 
                 <!-- Title -->
                 <div>
-                    <label class="block text-xs font-medium mb-1">
+                    <label class="block text-sm font-medium mb-1">
                         Title
                     </label>
                     <input type="text" v-model="form.title"
-                        class="w-full rounded-lg border px-3 py-2 text-sm font-medium focus:outline-none focus:ring-2" />
+                        class="w-full rounded-lg border px-3 py-2 text-base font-medium focus:outline-none focus:ring-2" />
                 </div>
 
                 <!-- Description -->
                 <div>
-                    <label class="block text-xs font-medium mb-1">
+                    <label class="block text-sm font-medium mb-1">
                         Description
                     </label>
                     <textarea v-model="form.description" rows="3"
-                        class="w-full rounded-lg border px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2" />
+                        class="w-full rounded-lg border px-3 py-2 text-base resize-none focus:outline-none focus:ring-2" />
                 </div>
 
                 <!-- Priority + Completion -->
@@ -103,7 +112,7 @@ onBeforeUnmount(() => {
 
                     <!-- Priority -->
                     <div>
-                        <label class="flex items-center gap-1 text-xs font-medium mb-1 group">
+                        <label class="flex items-center gap-1 text-sm font-medium mb-1 group">
                             Priority
 
                             <!-- Info icon -->
@@ -115,45 +124,39 @@ onBeforeUnmount(() => {
                                 <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2
                        hidden group-hover:block
                        whitespace-nowrap rounded-md bg-gray-800 px-2 py-1
-                       text-[10px] text-white shadow-lg">
+                       text-[12px] text-white shadow-lg">
                                     Priority goes from 1 (highest) → 5 (lowest)
                                 </span>
                             </span>
                         </label>
                         <input type="number" v-model.number="form.priority" min="1" max="5"
-                            class="w-24 rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2" />
+                            class="w-24 rounded-lg border px-3 py-2 text-base focus:outline-none focus:ring-2" />
                     </div>
 
-                    <!-- Completed -->
-                    <label class="flex items-center gap-2 text-sm font-medium cursor-pointer">
-                        <input type="checkbox" v-model="form.completed" class="h-4 w-4 rounded border" />
-                        Completed
-                    </label>
-                </div>
-
-                <!-- Completion Date -->
-                <div>
-                    <label class="block text-xs font-medium mb-1">
-                        Deadline
-                    </label>
-                    <input type="date" v-model="form.completion_date"
-                        class="rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2" />
+                    <!-- Completion Date -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            Deadline
+                        </label>
+                        <input type="date" v-model="form.completion_date"
+                            class="rounded-lg border px-3 py-2 text-base focus:outline-none focus:ring-2" />
+                    </div>
                 </div>
 
             </div>
 
             <!-- Footer -->
             <div class="flex justify-end gap-2 border-t px-6 py-4">
-                <button v-if="isEdit" @click="emit('delete', form)" class="text-sm text-red-600">
+                <button v-if="isEdit" @click="emit('delete', form)" class="text-base text-red-600">
                     Delete
                 </button>
 
                 <div class="flex gap-2 ml-auto">
-                    <button @click="emit('close')" class="rounded-lg px-4 py-2 text-sm font-medium">
+                    <button @click="emit('close')" class="rounded-lg px-4 py-2 text-base font-medium">
                         Cancel
                     </button>
                     <button :disabled="!hasChanges" @click="emit('save', form)"
-                        class="bg-indigo-600 text-white px-4 py-2 rounded disabled:opacity-40">
+                        class="bg-gray-600 text-white px-4 py-2 rounded disabled:opacity-40">
                         Save
                     </button>
                 </div>
