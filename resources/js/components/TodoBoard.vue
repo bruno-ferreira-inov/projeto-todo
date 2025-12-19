@@ -2,6 +2,7 @@
 import { onMounted, ref, computed } from 'vue';
 import TodoModal from './TodoModal.vue';
 import TodoColumn from './TodoColumn.vue';
+import PillDropdown from './PillDropdown.vue';
 import dayjs from 'dayjs';
 
 const todos = ref([])
@@ -72,30 +73,30 @@ const fetchTodos = async () => {
 }
 
 
-const statusFilter = ref('all')
+const statusFilter = ref('All')
 
 const filteredTodos = computed(() => {
     return todos.value.filter(todo => {
-        if (statusFilter.value === 'completed') {
+        if (statusFilter.value === 'Completed') {
             return todo.completed
         }
 
-        if (statusFilter.value === 'pending') {
+        if (statusFilter.value === 'Pending') {
             return !todo.completed
         }
         return true
     })
 })
 
-const prioritySort = ref('none')
+const prioritySort = ref('No Priority')
 const sortedTodos = computed(() => {
     const list = [...filteredTodos.value]
 
-    if (prioritySort.value === 'asc') {
+    if (prioritySort.value === 'Priority ↑') {
         list.sort((a, b) => b.priority - a.priority)
     }
 
-    if (prioritySort.value === 'desc') {
+    if (prioritySort.value === 'Priority ↓') {
         list.sort((a, b) => a.priority - b.priority)
     }
 
@@ -131,19 +132,10 @@ onMounted(fetchTodos)
                 </span>
             </button>
             <!-- Status filter -->
-            <div class="justify-end">
-                <select v-model="statusFilter" class="appearance-none rounded-full bg-gray-100 px-4 py-2 text-sm text-gray-700
-                focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                    <option value="all">All</option>
-                    <option value="pending">Pending</option>
-                    <option value="completed">Completed</option>
-                </select>
-                <select v-model="prioritySort" class="appearance-none rounded-full bg-gray-100 px-4 py-2 ml-2 text-sm text-gray-700
-                focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer">
-                    <option value="none">No Priority Order</option>
-                    <option value="asc">Priority ↑ (Low → High)</option>
-                    <option value="desc">Priority ↓ (High → Low)</option>
-                </select>
+            <div class="justify-end px-8">
+                <PillDropdown v-model="prioritySort" :options="['No Priority', 'Priority ↑', 'Priority ↓']"
+                    class="mr-2" />
+                <PillDropdown v-model="statusFilter" :options="['All', 'Pending', 'Completed']" />
             </div>
         </div>
     </div>
@@ -151,12 +143,19 @@ onMounted(fetchTodos)
     <div class="w-full flex justify-center">
 
         <div class="flex items-start gap-4 overflow-x-auto px-6 py-4 max-w-full">
-            <TodoColumn title="Overdue" :todos="groupedTodos.overdue" @edit="openEdit"></TodoColumn>
-            <TodoColumn title="Today" :todos="groupedTodos.today" @edit="openEdit"></TodoColumn>
-            <TodoColumn title="Next 3 Days" :todos="groupedTodos.next3" @edit="openEdit"></TodoColumn>
-            <TodoColumn title="Next 7 Days" :todos="groupedTodos.next7" @edit="openEdit"></TodoColumn>
-            <TodoColumn title="Later" :todos="groupedTodos.later" @edit="openEdit"></TodoColumn>
-            <TodoColumn title="No current time limit" :todos="groupedTodos.noDeadline" @edit="openEdit"></TodoColumn>
+            <TodoColumn v-if="groupedTodos.overdue.length > 0" title="Overdue" :todos="groupedTodos.overdue"
+                @edit="openEdit">
+            </TodoColumn>
+            <TodoColumn v-if="groupedTodos.today.length > 0" title="Today" :todos="groupedTodos.today" @edit="openEdit">
+            </TodoColumn>
+            <TodoColumn v-if="groupedTodos.next3.length > 0" title="Next 3 Days" :todos="groupedTodos.next3"
+                @edit="openEdit"></TodoColumn>
+            <TodoColumn v-if="groupedTodos.next7.length > 0" title="Next 7 Days" :todos="groupedTodos.next7"
+                @edit="openEdit"></TodoColumn>
+            <TodoColumn v-if="groupedTodos.later.length > 0" title="Later" :todos="groupedTodos.later" @edit="openEdit">
+            </TodoColumn>
+            <TodoColumn v-if="groupedTodos.noDeadline.length > 0" title="No Deadline" :todos="groupedTodos.noDeadline"
+                @edit="openEdit"></TodoColumn>
         </div>
     </div>
 

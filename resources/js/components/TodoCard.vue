@@ -17,7 +17,7 @@ const handleClick = () => {
 
 <template>
     <button @click="handleClick" class="block w-full rounded-xl border-t border-gray-300 p-3
-    hover:bg-gray-300 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+    hover:bg-gray-300">
 
         <div class="flex flex-col h-full min-h-[24px]">
             <div class="text-base font-medium text-gray-900">

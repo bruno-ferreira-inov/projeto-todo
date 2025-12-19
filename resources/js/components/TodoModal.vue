@@ -52,7 +52,7 @@ const handleKeydown = (e) => {
     }
 
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-        save()
+        emit('save', form.value)
     }
 }
 
@@ -68,10 +68,11 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
-        <div class="w-full max-w-lg rounded-2xl bg-white shadow-xl">
+        <div class="w-full max-w-lg rounded-2xl bg-gray-100 shadow-xl">
 
             <!-- Header -->
-            <div class="border-b w-124 justify-center px-6 py-4">
+            <div
+                class="border-b border-gray-400 w-full rounded-tl-xl rounded-tr-xl justify-center bg-gray-300 px-6 py-4">
                 <div class="flex justify-between">
 
                     <h2 class="text-2xl font-semibold">
@@ -95,7 +96,7 @@ onBeforeUnmount(() => {
                         Title
                     </label>
                     <input type="text" v-model="form.title"
-                        class="w-full rounded-lg border px-3 py-2 text-base font-medium focus:outline-none focus:ring-2" />
+                        class="w-full rounded-lg border border-gray-400 px-3 py-2 text-base font-medium focus:outline-none focus:ring-1" />
                 </div>
 
                 <!-- Description -->
@@ -104,7 +105,7 @@ onBeforeUnmount(() => {
                         Description
                     </label>
                     <textarea v-model="form.description" rows="3"
-                        class="w-full rounded-lg border px-3 py-2 text-base resize-none focus:outline-none focus:ring-2" />
+                        class="w-full rounded-lg border border-gray-400 px-3 py-2 text-base resize-none focus:outline-none focus:ring-1" />
                 </div>
 
                 <!-- Priority + Completion -->
@@ -123,14 +124,14 @@ onBeforeUnmount(() => {
                                 <!-- Tooltip -->
                                 <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2
                        hidden group-hover:block
-                       whitespace-nowrap rounded-md bg-gray-800 px-2 py-1
+                       whitespace-nowrap rounded-md bg-gray-600 px-2 py-1
                        text-[12px] text-white shadow-lg">
                                     Priority goes from 1 (highest) → 5 (lowest)
                                 </span>
                             </span>
                         </label>
                         <input type="number" v-model.number="form.priority" min="1" max="5"
-                            class="w-24 rounded-lg border px-3 py-2 text-base focus:outline-none focus:ring-2" />
+                            class="w-24 rounded-lg border border-gray-400 px-3 py-2 text-base focus:outline-none focus:ring-2" />
                     </div>
 
                     <!-- Completion Date -->
@@ -139,14 +140,15 @@ onBeforeUnmount(() => {
                             Deadline
                         </label>
                         <input type="date" v-model="form.completion_date"
-                            class="rounded-lg border px-3 py-2 text-base focus:outline-none focus:ring-2" />
+                            class="rounded-lg border border-gray-400 px-3 py-2 text-base focus:outline-none focus:ring-2" />
                     </div>
                 </div>
 
             </div>
 
             <!-- Footer -->
-            <div class="flex justify-end gap-2 border-t px-6 py-4">
+            <div
+                class="flex justify-end gap-2 border-t border-gray-400 bg-gray-300 rounded-br-xl rounded-bl-xl px-6 py-4">
                 <button v-if="isEdit" @click="emit('delete', form)" class="text-base text-red-600">
                     Delete
                 </button>
