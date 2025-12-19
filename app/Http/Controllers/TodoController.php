@@ -34,7 +34,7 @@ class TodoController extends Controller
         ]);
         $todo = Todo::create($validated);
 
-        return response()->json($todo);
+        return response()->json($todo, 201);
     }
 
     public function update(Request $request, Todo $todo)
@@ -62,6 +62,8 @@ class TodoController extends Controller
     public function delete(Todo $todo)
     {
         $todo->delete();
+
+        return response()->noContent();
     }
     public function toggle(Todo $todo)
     {

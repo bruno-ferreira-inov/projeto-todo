@@ -31,7 +31,7 @@ The communication between both parts is done with JSON-based HTTP requests.
 #### Project Structure
 
 -   `app/Http/Controllers/TodoController.php` – API logic and validation
--   `resources/js/components/TodoBoard.vue` – main board state
+-   `resources/js/components/TodoBoard.vue` – main board state and grouping logic
 -   `resources/js/components/TodoModal.vue` – create/edit modal
 
 ## Features
